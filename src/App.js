@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { Container, Grid, Button, makeStyles } from '@material-ui/core'
 import { Add as AddIcon } from '@material-ui/icons'
 import {
-  Title, FormSave, ActionControl, DataTable
+  Title, 
+  FormSave, 
+  ActionControl, 
+  DataTable
 } from './components'
+import { useSnackbar } from 'notistack'
 
 const useStyles = makeStyles(theme => ({
   btnAdd: {
@@ -19,6 +23,7 @@ const App = () => {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState(0)
   const [sort, setSort] = useState(0)
+  const { enqueueSnackbar } = useSnackbar()
 
   const onOpenForm = (task) => {
     if (!task.id) {
@@ -51,9 +56,15 @@ const App = () => {
       })
       if (index === -1) return
       newTasks[index] = { ...task }
+      enqueueSnackbar('Cập nhật công việc thành công!', {
+        variant: "success"
+      })
     } else {
       task.id = tasks.length + 1
       newTasks = [{ ...task }, ...newTasks]
+      enqueueSnackbar('Tạo mới công việc thành công!', {
+        variant: "success"
+      })
     }
     updateTasks(newTasks)
     onCloseForm()
@@ -61,6 +72,9 @@ const App = () => {
   const removeTask = id => {
     let newTasks = tasks.filter(task => task.id !== id)
     updateTasks(newTasks)
+    enqueueSnackbar('Xóa công việc thành công!', {
+      variant: "success"
+    })
   }
   const handleAction = ({ filter, search }) => {
     setSearch(search)

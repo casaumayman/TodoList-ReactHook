@@ -2,9 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { SnackbarProvider } from 'notistack'
 
 ReactDOM.render(
-  <App />,
+  <SnackbarProvider 
+    autoHideDuration={3000}
+    iconVariant={{
+      success: '✅',
+      error: '✖️',
+      warning: '⚠️',
+      info: 'ℹ️',
+    }}
+    anchorOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+  >
+    <App />
+  </SnackbarProvider>,
   document.getElementById('root')
 );
 
