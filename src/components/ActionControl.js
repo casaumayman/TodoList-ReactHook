@@ -5,12 +5,12 @@ import SearchIcon from '@material-ui/icons/Search'
 const useStyles = makeStyles({
   statusInput: {
     marginTop: 5,
-    width: 160
+    flexGrow: 2
   },
   searchInput: {
     marginRight: 8,
     marginLeft: 8,
-    width: '78%'
+    flexGrow: 8
   },
   container: {
     marginTop: 20,

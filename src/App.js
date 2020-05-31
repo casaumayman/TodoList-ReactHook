@@ -8,6 +8,10 @@ import {
   DataTable
 } from './components'
 import { useSnackbar } from 'notistack'
+import comparer from './services/sort'
+import removeTask from './services/remove'
+import { filterName, filterStatus } from './services/filter'
+import store from './services/storeController'
 
 const useStyles = makeStyles(theme => ({
   btnAdd: {
@@ -38,13 +42,17 @@ const App = () => {
   }
   useEffect(() => {
     if (localStorage && localStorage.getItem('tasks')) {
-      let list = JSON.parse(localStorage.getItem('tasks'))
+      let list = store.get()
       setTasks(list)
+    } else {
+      enqueueSnackbar('Trình duyệt không hỗ trợ web stored!', {
+        variant: 'error'
+      })
     }
-  }, [])
+  }, [enqueueSnackbar])
   const updateTasks = tasks => {
     setTasks(tasks)
-    localStorage.setItem('tasks', JSON.stringify(tasks))
+    store.set(tasks)
   }
   const onSaveTask = task => {
     let newTasks = [...tasks]
@@ -69,41 +77,15 @@ const App = () => {
     updateTasks(newTasks)
     onCloseForm()
   }
-  const removeTask = id => {
-    let newTasks = tasks.filter(task => task.id !== id)
-    updateTasks(newTasks)
-    enqueueSnackbar('Xóa công việc thành công!', {
-      variant: "success"
-    })
-  }
   const handleAction = ({ filter, search }) => {
     setSearch(search)
     setFilter(filter)
   }
 
-  const comparer = (a, b) => {
-    if (!sort) return 0
-    if (sort === 1) {
-      if (a.status && !b.status) return 1
-      if (!a.status && b.status) return -1
-      return 0
-    } else {
-      if (a.status && !b.status) return -1
-      if (!a.status && b.status) return 1
-    }
-  }
-
   let taskList = tasks
-    .filter(task => (filter === 0) || 
-      (task.status && filter === 1) ||
-      (!task.status && filter === 2)
-    )
-    .filter(task => task
-      .name
-      .toUpperCase()
-      .indexOf(search.toUpperCase()) !== -1
-    )
-    .sort(comparer)
+    .filter(filterStatus(filter))
+    .filter(filterName(search))
+    .sort(comparer(sort))
   return (
     <Container>
       <Title />
@@ -132,7 +114,7 @@ const App = () => {
           />
           <DataTable
             tasks={taskList}
-            onRemoveTask={removeTask}
+            onRemoveTask={removeTask(tasks, updateTasks, enqueueSnackbar)}
             onOpenForm={onOpenForm}
             onSort={() => setSort(s => (s + 1) % 3)}
             sort={sort}
